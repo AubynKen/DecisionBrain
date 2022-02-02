@@ -1,0 +1,9 @@
+import pandas as pd
+
+df_employees = pd.read_excel('InstanceBordeauxV1.xlsx', sheet_name = 0)
+
+print(df_employees)
+
+print(df_employees.columns)
+
+print(df_employees.EmployeeName)
