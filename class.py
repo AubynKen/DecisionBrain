@@ -15,8 +15,8 @@ class Task:
         self.latitude = latitude
         self.longitude = longitude
         self.duration = duration
-        self.Skill = skill
-        self.Level = level
+        self.skill = skill
+        self.level = level
         self.openingtime = openingtime
         self.closingtime = closingtime
 
