@@ -53,8 +53,7 @@ class Employee:
     def __repr__(self):
         return f"Employee(name={self.name}, " \
                f"position=[{self.longitude}, {self.latitude}], " \
-               f"skill={self.skill}," \
-               f"level={self.level}," \
+               f"skill_requirement=level {self.level} {self.skill}," \
                f"available=[{self.__start_time_string()}, {self.__end_time_string()}] )"
 
 
@@ -80,7 +79,7 @@ class Task:
         Task.count += 1
 
     @classmethod
-    def load_excel(cls, path):
+    def load_excel(cls, path, initialize=False):
         df = pd.read_excel(path, sheet_name="Tasks")
         df.set_index("TaskId")
 
@@ -97,6 +96,9 @@ class Task:
                  row["Level"],
                  opening_time,
                  closing_time)
+
+        if initialize:
+            cls.initialize_distance()
 
     @staticmethod
     def calculate_distance(task1, task2):
@@ -128,3 +130,10 @@ class Task:
 
     def __eq__(self, other):
         return self.id == other.id
+
+    def __repr__(self):
+        return f"Task(id={self.id}, " \
+               f"position=[{self.longitude}, {self.latitude}], " \
+               f"duration={self.duration}, " \
+               f"skill_requirement=level {self.level} {self.skill}," \
+               f"open from {self.opening_time} to {self.closing_time}"

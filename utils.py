@@ -1,5 +1,3 @@
-# this file contains utility functions used in the project
-
 from datetime import datetime
 
 
