@@ -44,17 +44,11 @@ class Employee:
     def __str__(self):
         return self.name
 
-    def __start_time_string(self):
-        return self.start_time.strftime('%I:%M%p')
-
-    def __end_time_string(self):
-        return self.end_time.strftime('%I:%M%p')
-
     def __repr__(self):
         return f"Employee(name={self.name}, " \
                f"position=[{self.longitude}, {self.latitude}], " \
                f"skill_requirement=level {self.level} {self.skill}," \
-               f"available=[{self.__start_time_string()}, {self.__end_time_string()}] )"
+               f"available=[{self.start_time.strftime('%I:%M%p')}, {self.end_time.strftime('%I:%M%p')}] )"
 
 
 class Task:
@@ -79,7 +73,15 @@ class Task:
         Task.count += 1
 
     @classmethod
-    def load_excel(cls, path, initialize=False):
+    def load_excel(cls, path, initialize_distance=False, load_depot=False):
+
+        # create a dummy task at position 0 for depot
+        if load_depot:
+            df_employees = pd.read_excel(path, sheet_name="Employees")
+            depot_longitude = df_employees.iloc[0]["Longitude"]
+            depot_latitude = df_employees.iloc[0]["Latitude"]
+            Task("T0", depot_latitude, depot_longitude, 0, None, 0, None, None)
+
         df = pd.read_excel(path, sheet_name="Tasks")
         df.set_index("TaskId")
 
@@ -97,7 +99,7 @@ class Task:
                  opening_time,
                  closing_time)
 
-        if initialize:
+        if initialize_distance:
             cls.initialize_distance()
 
     @staticmethod
@@ -136,4 +138,4 @@ class Task:
                f"position=[{self.longitude}, {self.latitude}], " \
                f"duration={self.duration}, " \
                f"skill_requirement=level {self.level} {self.skill}," \
-               f"open from {self.opening_time} to {self.closing_time}"
+               f"opening_time=[{self.opening_time.strftime('%I:%M%p')} to {self.closing_time.strftime('%I:%M%p')}]"
