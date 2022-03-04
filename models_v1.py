@@ -2,13 +2,13 @@ import pandas as pd
 import numpy as np
 from datetime import datetime
 from math import radians, cos, sin, asin, sqrt
-from utils import parse_time
+from utils import parse_time, parse_time_minute
 
 
 class Employee:
     list = []  # initialized to empty list
     count = 0
-    speed = 50  # unit: km/h
+    speed = 50 * 1000 / 60  # unit: meter/minute
 
     def __init__(self, name: str, latitude: float, longitude: float, skill: str, level: int, start_time, end_time):
         self.name = name
@@ -16,8 +16,10 @@ class Employee:
         self.longitude = longitude
         self.skill = skill
         self.level = level
-        self.start_time = parse_time(start_time)
-        self.end_time = parse_time(end_time)
+        self.start_time_str = parse_time(start_time)  # parse time into datetime object for printing
+        self.end_time_str = parse_time(end_time)
+        self.start_time = parse_time_minute(start_time)  # parse time into minutes
+        self.end_time = parse_time_minute(end_time)
         Employee.count += 1
         Employee.list.append(self)
 
@@ -48,7 +50,7 @@ class Employee:
         return f"Employee(name={self.name}, " \
                f"position=[{self.longitude}, {self.latitude}], " \
                f"skill_requirement=level {self.level} {self.skill}," \
-               f"available=[{self.start_time.strftime('%I:%M%p')}, {self.end_time.strftime('%I:%M%p')}] )"
+               f"available=[{self.start_time_str.strftime('%I:%M%p')}, {self.end_time_str.strftime('%I:%M%p')}] )"
 
 
 class Task:
@@ -66,8 +68,10 @@ class Task:
         self.duration = duration
         self.skill = skill
         self.level = level
-        self.opening_time = parse_time(opening_time)
-        self.closing_time = parse_time(closing_time)
+        self.opening_time_str = parse_time(opening_time)
+        self.closing_time_str = parse_time(closing_time)
+        self.opening_time = parse_time_minute(opening_time)
+        self.closing_time = parse_time_minute(closing_time)
 
         Task.list.append(self)
         Task.count += 1
@@ -112,13 +116,13 @@ class Task:
         dlat = lat2 - lat1
         a = sin(dlat / 2) ** 2 + cos(lat1) * cos(lat2) * sin(dlon / 2) ** 2
         c = 2 * asin(sqrt(a))
-        r = 6371
+        r = 6371 * 1000  # radius of earth
         return c * r
 
     @classmethod
     def initialize_distance(cls):
         if cls.__is_initialized:
-            raise Exception("Distance has already been initialized")
+            print("Warning: trying to reinitialize an initialized task list, recalculating the distance matrix")
         cls.__is_initialized = True
         cls.distance = np.zeros((cls.count, cls.count), dtype=np.float64)
 
@@ -134,8 +138,11 @@ class Task:
         return self.id == other.id
 
     def __repr__(self):
+        opening_time = self.opening_time_str.strftime('%I:%M%p')
+        closing_time = self.closing_time_str.strftime('%I:%M%p')
         return f"Task(id={self.id}, " \
                f"position=[{self.longitude}, {self.latitude}], " \
                f"duration={self.duration}, " \
                f"skill_requirement=level {self.level} {self.skill}," \
-               f"opening_time=[{self.opening_time.strftime('%I:%M%p')} to {self.closing_time.strftime('%I:%M%p')}]"
+               f"opening_time=[{opening_time} to {closing_time}] "
+
