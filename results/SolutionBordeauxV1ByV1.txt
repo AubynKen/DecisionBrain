@@ -1,14 +1,14 @@
 taskId;performed;employeeName;startTime; 
-T1;1;Ambre;898.0;
-T2;1;Ambre;1020.0;
-T3;1;Valentin;555.0;
-T4;1;Valentin;693.0;
-T5;1;Valentin;480.0;
-T6;1;Valentin;623.0;
-T7;1;Valentin;779.0;
-T8;1;Ambre;548.0;
-T9;1;Valentin;1020.0;
-T10;1;Ambre;480.0;
+T1;1;Ambre;695.9999999999956;
+T2;1;Ambre;817.9999999999922;
+T3;1;Valentin;800.9999999999837;
+T4;1;Valentin;662.9999999999924;
+T5;1;Valentin;875.9999999999769;
+T6;1;Valentin;732.9999999999881;
+T7;1;Valentin;576.9999999999958;
+T8;1;Ambre;557.9999999999969;
+T9;1;Valentin;501.99999999999926;
+T10;1;Ambre;489.999999999999;
 
 employeeName;lunchBreakStartTime;
 Valentin;0;
