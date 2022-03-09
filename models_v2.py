@@ -53,14 +53,17 @@ class Employee:
                f"available=[{self.start_time_str.strftime('%I:%M%p')}, {self.end_time_str.strftime('%I:%M%p')}] )"
 
 
-class Task:
+class Node:
     list = []
     count = 0
+    count_task = 0
+    count_unavail = 0
     distance: np.array = None
     __is_initialized = False
 
-    def __init__(self, task_id, latitude, longitude, duration, skill, level, opening_time, closing_time):
-        if Task.__is_initialized:
+    def __init__(self, task_id, latitude, longitude, duration, skill, level, opening_time, closing_time,
+                 node_type: str):
+        if Node.__is_initialized:
             raise Exception("Cannot instantiate new task after initializing the distance matrix")
         self.id = task_id
         self.latitude = latitude
@@ -72,42 +75,59 @@ class Task:
         self.closing_time_str = parse_time(closing_time)
         self.opening_time = parse_time_minute(opening_time)
         self.closing_time = parse_time_minute(closing_time)
-
-        Task.list.append(self)
-        Task.count += 1
+        self.node_type = node_type
+        Node.list.append(self)
+        Node.count += 1
 
     @classmethod
-    def load_excel(cls, path, initialize_distance=False, load_depot=False):
+    def load_excel(cls, path, initialize_distance=False):
 
-        # create a dummy task at position 0 for depot
-        if load_depot:
-            df_employees = pd.read_excel(path, sheet_name="Employees")
-            depot_longitude = df_employees.iloc[0]["Longitude"]
-            depot_latitude = df_employees.iloc[0]["Latitude"]
-            Task("T0", depot_latitude, depot_longitude, 0, None, 0, None, None)
+        # create a dummy task for each home on top of the list
+        df_employees = pd.read_excel(path, sheet_name="Employees")
+        df_employees.set_index("EmployeeName")
+        for _, row in df_employees.iterrows():
+            Node(row["EmployeeName"] + "'s Home", row["Latitude"], row["Longitude"], 0, None, 0, None, None, "home")
 
+        # load tasks
         df = pd.read_excel(path, sheet_name="Tasks")
         df.set_index("TaskId")
-
         for index, row in df.iterrows():
             # parse the start time and end time into datetime object
             opening_time = datetime.strptime(row["OpeningTime"], '%I:%M%p')
             closing_time = datetime.strptime(row["ClosingTime"], '%I:%M%p')
 
-            Task(row["TaskId"],
+            Node(row["TaskId"],
                  row["Latitude"],
                  row["Longitude"],
                  row["TaskDuration"],
                  row["Skill"],
                  row["Level"],
                  opening_time,
-                 closing_time)
+                 closing_time, node_type="task")
+
+        # create a task for each unavailability at the bottom of the list
+        df_employees_unavailabilities = pd.read_excel(path, sheet_name="Employees Unavailabilities")
+        df_employees_unavailabilities.set_index("EmployeeName")
+        for _, row in df_employees_unavailabilities.iterrows():
+            open_time = row["Start"]
+            close_time = row["End"]
+            duration = parse_time_minute(close_time) - parse_time_minute(open_time)
+            Node(row["EmployeeName"], row["Latitude"], row["Longitude"], duration, None, 0, open_time, close_time,
+                 node_type="unavail")
+
+        # create a dummy task for each lunch at the bottom of the list
+        df_employees = pd.read_excel(path, sheet_name="Employees")
+        df_employees.set_index("EmployeeName")
+        for _, row in df_employees.iterrows():
+            Node(row["EmployeeName"] + "'s Lunch", None, None, 60, None, 0, "12:00am", "2:00pm", "lunch")
 
         if initialize_distance:
             cls.initialize_distance()
 
     @staticmethod
     def calculate_distance(task1, task2):
+        if task1.node_type == "lunch" or task2.node_type == "lunch":
+            return 0
         lon1, lat1 = radians(task1.longitude), radians(task1.latitude)
         lon2, lat2 = radians(task2.longitude), radians(task2.latitude)
 
@@ -124,7 +144,7 @@ class Task:
         if cls.__is_initialized:
             print("Warning: trying to reinitialize an initialized task list, recalculating the distance matrix")
         cls.__is_initialized = True
-        cls.distance = np.zeros((cls.count, cls.count), dtype=np.float64)
+        cls.distance = np.zeros((len(Node.list), len(Node.list)), dtype=np.float64)
 
         for i in range(cls.count):
             for j in range(i):
@@ -145,4 +165,3 @@ class Task:
                f"duration={self.duration}, " \
                f"skill_requirement=level {self.level} {self.skill}," \
                f"opening_time=[{opening_time} to {closing_time}] "
-
