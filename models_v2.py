@@ -9,6 +9,7 @@ class Employee:
     list = []  # initialized to empty list
     count = 0
     speed = 50 * 1000 / 60  # unit: meter/minute
+    __name_employee_correspondance = {}
 
     def __init__(self, name: str, latitude: float, longitude: float, skill: str, level: int, start_time, end_time):
         self.name = name
@@ -22,6 +23,11 @@ class Employee:
         self.end_time = parse_time_minute(end_time)
         Employee.count += 1
         Employee.list.append(self)
+        Employee.__name_employee_correspondance[name] = self
+
+    @classmethod
+    def find_by_name(cls, name):
+        return cls.__name_employee_correspondance[name]
 
     @classmethod
     def load_excel(cls, path):
@@ -160,8 +166,16 @@ class Node:
     def __repr__(self):
         opening_time = self.opening_time_str.strftime('%I:%M%p')
         closing_time = self.closing_time_str.strftime('%I:%M%p')
-        return f"Task(id={self.id}, " \
-               f"position=[{self.longitude}, {self.latitude}], " \
-               f"duration={self.duration}, " \
-               f"skill_requirement=level {self.level} {self.skill}," \
-               f"opening_time=[{opening_time} to {closing_time}] "
+
+        if self.node_type == "task":
+            return f"Task(id={self.id}, " \
+                   f"position=[{self.longitude}, {self.latitude}], " \
+                   f"duration={self.duration}, " \
+                   f"skill_requirement=level {self.level} {self.skill}," \
+                   f"opening_time=[{opening_time} to {closing_time}] "
+
+        if self.node_type == "lunch":
+            return f"Lunch({self.id})"
+
+        if self.node_type == "home":
+            return f"Home({self.id})"
