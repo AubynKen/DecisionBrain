@@ -46,7 +46,7 @@ def plot_map(employee_list, node_list, tasks, unavails, X, L, Z):
 
     for k in range(t):
         for i in all_indexes:
-            if k != i and L[(k,i)].x == 1:
+            if L[(k,i)].x == 1:
                 employee = employee_list[k]
                 node = node_list[i]
                 plt.scatter([node.longitude], [node.latitude], label= f"Pause de {employee.name}", marker = "$(P)$", s = 10000)
