@@ -17,16 +17,19 @@ def parse_time_minute(time):
     return int((parse_time(time) - datetime(year=1901, month=1, day=1, hour=0)).seconds / 60)
 
 
-def store_result(target_path, employees, tasks, z, b):
+def store_result(target_path, employees, tasks, lunch_times, z, b):
     w, t = len(tasks), len(employees)
     with open(target_path, "w") as f:
         f.write("taskId;performed;employeeName;startTime; \n")
-        for i in range(v):
-            f.write(f"T{i+1};1;{employees[z[i]].name};{b[i].x};\n")
+        for i in tasks:
+            if i in z.keys() :
+                f.write(f"T{i+1+2*t};1;{employees[z[i]].name};{b[i].x};\n")
+            else :
+                f.write(f"T{i+1+2*t};0;;;\n")
         f.write("\n")
         f.write("employeeName;lunchBreakStartTime;\n")
         for k in range(t):
-            f.write(f"{employees[k].name};0;\n")
+            f.write(f"{employees[k].name};{lunch_times[k]};\n")
     return
 
 def cm_to_inch(value):
