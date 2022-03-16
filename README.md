@@ -1,5 +1,5 @@
 # DecisionBrain
-Repository for a student project
+This repository was created for a student project at the CentraleSupélec engineering school in France.
 
 ## Structure
 - the **data** directory contains Excel files for different instances
