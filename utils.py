@@ -4,6 +4,7 @@ import random as rd
 
 
 def parse_time(time):
+    """Parse time from string into datetime object"""
     if not time:
         return
     if type(time) == str:
@@ -12,7 +13,13 @@ def parse_time(time):
 
 
 def parse_time_minute(time):
-    if time is None:
+    """
+    Parse time from datetime object into minutes
+
+    :param time: datetime object representing the time
+    :return: the number of minutes elapsed since midnight
+    """
+    if not time:
         return
     return int((parse_time(time) - datetime(year=1901, month=1, day=1, hour=0)).seconds / 60)
 
