@@ -132,7 +132,7 @@ class Node:
         dlat = lat2 - lat1
         a = sin(dlat / 2) ** 2 + cos(lat1) * cos(lat2) * sin(dlon / 2) ** 2
         c = 2 * asin(sqrt(a))
-        r = 6371 * 1000  # radius of earth in meter
+        r = 6371000  # radius of earth in meter
         return c * r
 
     @classmethod
