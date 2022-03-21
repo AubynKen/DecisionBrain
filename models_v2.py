@@ -36,6 +36,11 @@ class Employee:
         Employee.count += 1
         Employee.list.append(self)
 
+    def index_of(self):
+        for idx, employee in enumerate(Employee.list):
+            if employee == self:
+                return idx
+
     @classmethod
     def find_by_name(cls, name: str):
         """
@@ -72,6 +77,9 @@ class Employee:
                      row["Level"],
                      row["WorkingStartTime"],
                      row["WorkingEndTime"])
+
+    def home(self):
+        return Employee.index_of(self)
 
     def __hash__(self):
         return hash(self.name)  # an employee is uniquely identified by its name
