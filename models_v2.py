@@ -181,6 +181,19 @@ class Task(Node):
                 return task
         return None
 
+    def open_intervals(self):
+        """
+        Return a list of intervals for which the task is available
+        """
+        d, f = self.opening_time, self.closing_time
+        task_duration = self.duration
+        l = [d]
+        for s, e in Node.list[i].closed_intervals:
+            l.append(s)
+            l.append(e)
+        l.append(f)
+        return [(l[j], l[j + 1]) for j in range(0, len(l), 2) if l[j + 1] - l[j] >= task_duration]
+
     @classmethod
     def load_excel(cls, path: str):
         # clear previous data if any
