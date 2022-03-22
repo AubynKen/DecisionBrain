@@ -81,12 +81,8 @@ def plot_map(employee_list, node_list, tasks, unavails, X, L, Z):
     for i in tasks:
         task = node_list[i]
         node_pos.append([task.longitude, task.latitude])
-<<<<<<< HEAD
         plt.scatter([task.longitude], [task.latitude], label=task.id, marker = f"$({task.id})$", s = 10000)
         #plt.annotate(task.id,[task.longitude, task.latitude])
-=======
-        plt.scatter([task.longitude], [task.latitude], label=task.id, s=400)
->>>>>>> bf40f241f3a106f53c10e823753581cab3dd4d48
 
     for i in unavails:
         unavail = node_list[i]
@@ -114,7 +110,6 @@ def plot_map(employee_list, node_list, tasks, unavails, X, L, Z):
                 else:
                     clr = color[Z[i]]
 
-<<<<<<< HEAD
                 plt.plot([node_pos[a][0], node_pos[b][0]], [node_pos[a][1], node_pos[b][1]], c= clr, label = lbl)
 
     plt.legend(prop={'size': 40},loc='center left', bbox_to_anchor=(1, 0.5))
@@ -162,9 +157,6 @@ def plot_agenda(employee_list, node_list, tasks, unavails, B, Z,lunch_times):
         Ax[k].axis('tight')
         Ax[k].axis('off')
         Ax[k].table(cellText=plan[k],colLabels=column_labels[k])
-=======
-                plt.plot([node_pos[a][0], node_pos[b][0]], [node_pos[a][1], node_pos[b][1]], c=clr, label=lbl)
->>>>>>> bf40f241f3a106f53c10e823753581cab3dd4d48
 
     plt.show()
 
