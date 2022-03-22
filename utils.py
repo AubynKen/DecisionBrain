@@ -64,7 +64,8 @@ def plot_map(employee_list, node_list, tasks, unavails, X, L, Z):
     for i in tasks:
         task = node_list[i]
         node_pos.append([task.longitude, task.latitude])
-        plt.scatter([task.longitude], [task.latitude], label=task.id, s = 400)
+        plt.scatter([task.longitude], [task.latitude], label=task.id, marker = f"$({task.id})$", s = 10000)
+        #plt.annotate(task.id,[task.longitude, task.latitude])
 
     for i in unavails:
         unavail = node_list[i]
@@ -94,6 +95,50 @@ def plot_map(employee_list, node_list, tasks, unavails, X, L, Z):
 
                 plt.plot([node_pos[a][0], node_pos[b][0]], [node_pos[a][1], node_pos[b][1]], c= clr, label = lbl)
 
+    plt.legend(prop={'size': 40},loc='center left', bbox_to_anchor=(1, 0.5))
+    plt.show()
 
-    plt.legend(prop={'size': 40})
+def time_format(min):
+    return f"{int(min//60)}:{int(min%60)}"
+
+def plot_agenda(employee_list, node_list, tasks, unavails, B, Z,lunch_times):
+    N = len(employee_list)
+    left, width = 0.1, 2.0
+    bottom, height = 0.1, 0.8
+
+    Table = {k : [left + width/N*k, bottom, width/N - 0.1, height] for k in range(N)}
+
+    Ax = {k : plt.axes(Table[k], frameon =False) for k in range(N)}
+
+    plan = [[] for i in range(N)]
+
+    for t in tasks:
+        if t in Z.keys():
+            plan[Z[t]].append((B[t].x,f"tâche {t-N+1}"))
+            plan[Z[t]].append((B[t].x+node_list[t].duration,f"tâche {t-N+1}"))
+    for k in range(N):
+        plan[k].append((lunch_times[k],f"pause déjeuner"))
+        plan[k].append((lunch_times[k]+60,f"pause déjeuner"))
+    for u in unavails:
+        plan[Z[u]].append((B[u].x,f"indisponibilité"))
+        plan[Z[u]].append((B[u].x+node_list[t].duration,f"indisponibilité"))
+
+    column_labels=[[] for i in range(N)]
+    for k in range(N) :
+        column_labels[k].append("horaires")
+        column_labels[k].append(f"{employee_list[k].name}")
+
+    for k in range(N):
+        plan[k].sort(key= lambda x: x[0])
+
+        chose = []
+        for i in range(0,len(plan[k])-1,2):
+            chose.append([f"{time_format(plan[k][i][0])} - {time_format(plan[k][i+1][0])}",plan[k][i][1]])
+        plan[k] = chose
+        
+    for k in range(N) :
+        Ax[k].axis('tight')
+        Ax[k].axis('off')
+        Ax[k].table(cellText=plan[k],colLabels=column_labels[k])
+
     plt.show()
