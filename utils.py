@@ -161,13 +161,13 @@ def plot_agenda(employee_list, node_list, tasks, unavails, B, Z,lunch_times):
     plt.show()
 
 
-def print_warning(warning: str, print_color="yellow"):
-    """Print a text in yellow"""
-    correspondance = {
-        "yellow": Colors.WARNING,
-        "cyan": Colors.CYAN,
-        "green": Colors.GREEN,
-        "red": Colors.FAIL
-    }
-    color = correspondance[print_color] if print_color in correspondance.keys() else Colors.WARNING
-    print(f"{color}Error: {warning}{Colors.NORMAL}")
+# def print_warning(warning: str, print_color="yellow"):
+#     """Print a text in yellow"""
+#     correspondance = {
+#         "yellow": Colors.WARNING,
+#         "cyan": Colors.CYAN,
+#         "green": Colors.GREEN,
+#         "red": Colors.FAIL
+#     }
+#     color = correspondance[print_color] if print_color in correspondance.keys() else Colors.WARNING
+#     print(f"{color}Error: {warning}{Colors.NORMAL}")
