@@ -67,7 +67,7 @@ for i in tasks:
 
 # C8
 for k in employees:
-    m.addConstr(B[k] <= P[k])
+    m.addConstr(B[k] - (1 - L[(k,k)])*M <= P[k])
     for i in tasks + unavails:
         m.addConstr(B[k] + ceil(Node.distance[k,i]/Employee.speed) - (1 - X[(k,i)]) * M <= B[i])
         m.addConstr(P[k] + 60 + ceil(Node.distance[k,i]/Employee.speed) - (2 - X[(k,i)] - L[(k,k)]) * M <= B[i])
@@ -77,7 +77,7 @@ for k in employees:
     for i in tasks + unavails:
         m.addConstr(B[i] + Node.list[i].duration + ceil(Node.distance[i,k]/Employee.speed) <= Employee.list[k].end_time + M*(1 - X[(i,k)]))
         m.addConstr(B[i] + Node.list[i].duration <= P[k] + M*(2-L[(k,i)]-X[(i,k)]))
-        m.addConstr(P[k] + 60 + Node.list[i].duration + ceil(Node.distance[i,k]/Employee.speed) <= Employee.list[k].end_time + M*(2 - X[(i,k)]- L[(k,i)]))
+        m.addConstr(P[k] + 60 + ceil(Node.distance[i,k]/Employee.speed) <= Employee.list[k].end_time + M*(2 - X[(i,k)]- L[(k,i)]))
 
 # C10_a
 for k in employees:
@@ -99,7 +99,7 @@ for i in tasks + unavails:
             pause_en_i = quicksum([L[(k,i)] for k in employees])
             m.addConstr(B[i] + Node.list[i].duration + ceil(Node.distance[i,j]/Employee.speed) <= B[j] + M * (1-X[(i,j)]) )
             m.addConstr(B[i] + Node.list[i].duration <= P[k] + M*(2-X[(i,j)]-pause_en_i))
-            m.addConstr(P[k] + 60 + Node.list[i].duration + ceil(Node.distance[i,j]/Employee.speed) <= B[j] + M * (2-X[(i,j)]-pause_en_i) )
+            m.addConstr(P[k] + 60 + ceil(Node.distance[i,j]/Employee.speed) <= B[j] + M * (2-X[(i,j)]-pause_en_i) )
             
 
 # C13
