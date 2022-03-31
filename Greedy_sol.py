@@ -35,11 +35,9 @@ def load_data_from_path(path_to_instance: str):
     tasks = list(range(T, T + W))
     unavails = list((range(T + W, V)))
     nodes = list(range(V))
-
+    
 path_to_test = path_bordeaux_v2 = "./data/InstancesV3/InstanceUkraineV3.xlsx"
 load_data_from_path(path_to_test)
-
-from collections import deque
 
 def index_to_employee(employee_idx):
     employee : Employee = Employee.list[employee_idx]
@@ -205,14 +203,21 @@ class GreedySolution:
                     continue
 
                 # step D: if the employee can't visit his next obstacle: remove the lunch or the task added in step B
+            # step D: if the employee can't visit his next obstacle: remove the lunch or the task added in step B
                 if decision == "lunch": # case 1: employee took lunch
                     self.employee_lunch_time[employee_idx] = None
+                    previous_task = self.employee_last_node(employee_idx)
+                    employee_remove_task(employee_idx, previous_task)
+                    self.employee_lunch_time[employee_idx] = max(parse_time_minute("12:00PM"),
+                                                                self.employee_finish_time(employee_idx))
                     employee_visit_next_obstacle(employee_idx)
                     continue
+            # case 2: employee took a task
                 # case 2: employee took a task
                 last_added_task_index = self.employee_last_node(employee_idx)
                 employee_remove_task(employee_idx, last_added_task_index)
                 employee_visit_next_obstacle(employee_idx)
+        return self
 
     def optimize_simultaneous(self):
 
@@ -274,18 +279,23 @@ class GreedySolution:
                 decision = "task"
 
             # step C: check if after step B, the employee can still visit his next obstacle (ie. next unavail or his home)
-            if self.employee_can_visit_next_obstacle(employee_idx):
-                continue
+            if self.employee_can_visit_next_obstacle(employee_idx): continue
 
-            # step D: if the employee can't visit his next obstacle: remove the lunch or the task added in step B
+            # step D:  if the employee can't visit his next obstacle: remove the lunch or the task added in step B
             if decision == "lunch": # case 1: employee took lunch
                 self.employee_lunch_time[employee_idx] = None
+                previous_task = self.employee_last_node(employee_idx)
+                employee_remove_task(employee_idx, previous_task)
+                self.employee_lunch_time[employee_idx] = max(parse_time_minute("12:00PM"),
+                                                             self.employee_finish_time(employee_idx))
                 employee_visit_next_obstacle(employee_idx)
                 continue
             # case 2: employee took a task
             last_added_task_index = self.employee_last_node(employee_idx)
             employee_remove_task(employee_idx, last_added_task_index)
             employee_visit_next_obstacle(employee_idx)
+
+        return self
 
     def calculate_time(self):
         """calculate the total time spent on work"""
