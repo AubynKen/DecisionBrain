@@ -36,7 +36,7 @@ def load_data_from_path(path_to_instance: str):
     unavails = list((range(T + W, V)))
     nodes = list(range(V))
 
-path_to_test = path_bordeaux_v2 = "./data/InstancesV3/InstanceColumbiaV3.xlsx"
+path_to_test = path_bordeaux_v2 = "./data/InstancesV3/InstanceUkraineV3.xlsx"
 load_data_from_path(path_to_test)
 
 from collections import deque
