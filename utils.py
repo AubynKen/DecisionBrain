@@ -60,13 +60,17 @@ def cm_to_inch(value):
 def plot_map(employee_list, node_list, tasks, unavails, X, L, Z):
     plt.figure(figsize=(cm_to_inch(100), cm_to_inch(100)))
 
+    number_of_colors = 8  # hardcoded
+    color = ["#" + ''.join([rd.choice('0123456789ABCDEF') for _ in range(6)])
+             for _ in range(number_of_colors)]
+
     node_pos = []
     for employee in employee_list:
         node_pos.append([employee.longitude, employee.latitude])
         rd_color = "#" + ''.join([rd.choice('0123456789ABCDEF')
                                   for _ in range(6)])
         plt.scatter([employee.longitude], [employee.latitude], label=f"Maison de {employee.name}", c=rd_color,
-                    marker="$(T)$", s=10000)
+                    marker="$(H)$", s=10000)
 
     t = len(employee_list)
     all_indexes = list(range(t)) + tasks + unavails
@@ -80,10 +84,16 @@ def plot_map(employee_list, node_list, tasks, unavails, X, L, Z):
                             s=10000)
 
     for i in tasks:
-        task = node_list[i]
-        node_pos.append([task.longitude, task.latitude])
-        plt.scatter([task.longitude], [task.latitude],
-                    label=task.id, marker=f"$({task.id})$", s=10000)
+        if i in Z.keys():
+            task = node_list[i]
+            node_pos.append([task.longitude, task.latitude])
+            plt.scatter([task.longitude], [task.latitude],
+                        label=task.id, marker=f"$({task.id})$",c = color[Z[i]] ,s=10000)
+        else:
+            task = node_list[i]
+            node_pos.append([task.longitude, task.latitude])
+            plt.scatter([task.longitude], [task.latitude],
+                         marker=f"$({task.id})$",s=10000)
         #plt.annotate(task.id,[task.longitude, task.latitude])
 
     for i in unavails:
@@ -92,10 +102,7 @@ def plot_map(employee_list, node_list, tasks, unavails, X, L, Z):
         plt.scatter([unavail.longitude], [unavail.latitude], label="Indisponibilité de " + unavail.employee.name,
                     marker="$(X)$", s=10000)
 
-    number_of_colors = 8  # hardcoded
-    color = ["#" + ''.join([rd.choice('0123456789ABCDEF') for _ in range(6)])
-             for _ in range(number_of_colors)]
-
+    
     n = len(node_pos)
     for a in range(n):
         for b in range(n):
