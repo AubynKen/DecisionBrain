@@ -196,7 +196,7 @@ class Task(Node):
         d, f = self.opening_time, self.closing_time
         task_duration = self.duration
         l = [d]
-        for s, e in Node.list[i].closed_intervals:
+        for s, e in self.closed_intervals:
             l.append(s)
             l.append(e)
         l.append(f)
