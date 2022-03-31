@@ -52,6 +52,21 @@ def store_result(target_path, employees, tasks, lunch_times, z, b):
             f.write(f"{employees[k].name};{lunch_times[k]};\n")
     return
 
+def store_result_V3(target_path, employees, tasks, lunch_times, z, b):
+    w, t = len(tasks), len(employees)
+    with open(target_path, "w") as f:
+        f.write("taskId;performed;employeeName;startTime; \n")
+        for i in tasks:
+            if i in z.keys():
+                f.write(f"T{i -t + 1};1;{employees[z[i]].name};{b[i]};\n")
+            else:
+                f.write(f"T{i - t + 1};0;;;\n")
+        f.write("\n")
+        f.write("employeeName;lunchBreakStartTime;\n")
+        for k in range(t):
+            f.write(f"{employees[k].name};{lunch_times[k]};\n")
+    return
+
 
 def cm_to_inch(value):
     return value / 2.54
@@ -65,11 +80,9 @@ def plot_map(employee_list, node_list, tasks, unavails, X, L, Z):
              for _ in range(number_of_colors)]
 
     node_pos = []
-    for employee in employee_list:
-        node_pos.append([employee.longitude, employee.latitude])
-        rd_color = "#" + ''.join([rd.choice('0123456789ABCDEF')
-                                  for _ in range(6)])
-        plt.scatter([employee.longitude], [employee.latitude], label=f"Maison de {employee.name}", c=rd_color,
+    for k in range(len(employee_list)):
+        node_pos.append([employee_list[k].longitude, employee_list[k].latitude])
+        plt.scatter([employee_list[k].longitude], [employee_list[k].latitude], label=f"Maison de {employee_list[k].name}", c=color(k),
                     marker="$(H)$", s=10000)
 
     t = len(employee_list)
@@ -88,19 +101,52 @@ def plot_map(employee_list, node_list, tasks, unavails, X, L, Z):
             task = node_list[i]
             node_pos.append([task.longitude, task.latitude])
             plt.scatter([task.longitude], [task.latitude],
-                        label=task.id, marker=f"$({task.id})$",c = color[Z[i]] ,s=10000)
+                        marker=f"$({task.id})$",c = color[Z[i]] ,s=10000)
         else:
             task = node_list[i]
             node_pos.append([task.longitude, task.latitude])
             plt.scatter([task.longitude], [task.latitude],
                          marker=f"$({task.id})$",s=10000)
-        #plt.annotate(task.id,[task.longitude, task.latitude])
 
     for i in unavails:
         unavail = node_list[i]
         node_pos.append([unavail.longitude, unavail.latitude])
         plt.scatter([unavail.longitude], [unavail.latitude], label="Indisponibilité de " + unavail.employee.name,
-                    marker="$(X)$", s=10000)
+                    marker="$(X)$", c = color[unavail.employee.index_of()], s=10000)
+
+def plot_map_V3(employee_list, node_list, tasks, unavails, X, Z):
+    plt.figure(figsize=(cm_to_inch(100), cm_to_inch(100)))
+
+    number_of_colors = len(employee_list)  # hardcoded
+    color = ["#" + ''.join([rd.choice('0123456789ABCDEF') for _ in range(6)])
+             for _ in range(number_of_colors)]
+
+    node_pos = []
+    for k in range(len(employee_list)):
+        node_pos.append([employee_list[k].longitude, employee_list[k].latitude])
+        plt.scatter([employee_list[k].longitude], [employee_list[k].latitude], label=f"Maison de {employee_list[k].name}", c=color[k],
+                    marker="$(H)$", s=10000)
+
+    t = len(employee_list)
+    all_indexes = list(range(t)) + tasks + unavails
+
+    for i in tasks:
+        if i in Z.keys():
+            task = node_list[i]
+            node_pos.append([task.longitude, task.latitude])
+            plt.scatter([task.longitude], [task.latitude]
+                        , marker=f"$({task.id})$",c = color[Z[i]] ,s=10000)
+        else:
+            task = node_list[i]
+            node_pos.append([task.longitude, task.latitude])
+            plt.scatter([task.longitude], [task.latitude],
+                         marker=f"$({task.id})$",c = "grey", s=10000)
+
+    for i in unavails:
+        unavail = node_list[i]
+        node_pos.append([unavail.longitude, unavail.latitude])
+        plt.scatter([unavail.longitude], [unavail.latitude], label="Indisponibilité de " + unavail.employee.name,
+                    marker="$(X)$", c = color[unavail.employee.index_of()], s=10000)
 
     
     n = len(node_pos)
@@ -108,7 +154,7 @@ def plot_map(employee_list, node_list, tasks, unavails, X, L, Z):
         for b in range(n):
             i = all_indexes[a]
             j = all_indexes[b]
-            if i != j and X[(i, j)].x == 1:
+            if i != j and (i, j) in list(X.keys()):
                 lbl = ""
                 clr = "black"
                 if i in range(t):
@@ -174,14 +220,46 @@ def plot_agenda(employee_list, node_list, tasks, unavails, B, Z, lunch_times):
 
     plt.show()
 
+def plot_agenda_V3(employee_list, node_list, tasks, unavails, B, Z, lunch_times):
+    N = len(employee_list)
+    left, width = 0.1, 2.0
+    bottom, height = 0.1, 0.8
 
-# def print_warning(warning: str, print_color="yellow"):
-#     """Print a text in yellow"""
-#     correspondance = {
-#         "yellow": Colors.WARNING,
-#         "cyan": Colors.CYAN,
-#         "green": Colors.GREEN,
-#         "red": Colors.FAIL
-#     }
-#     color = correspondance[print_color] if print_color in correspondance.keys() else Colors.WARNING
-#     print(f"{color}Error: {warning}{Colors.NORMAL}")
+    Table = {k: [left + width/N*k, bottom, width/N - 0.1, height]
+             for k in range(N)}
+
+    Ax = {k: plt.axes(Table[k], frameon=False) for k in range(N)}
+
+    plan = [[] for i in range(N)]
+
+    for t in tasks:
+        if t in Z.keys():
+            plan[Z[t]].append((B[t], f"tâche {t-N+1}"))
+            plan[Z[t]].append((B[t]+node_list[t].duration, f"tâche {t-N+1}"))
+    for k in range(N):
+        plan[k].append((lunch_times[k], f"pause déjeuner"))
+        plan[k].append((lunch_times[k]+60, f"pause déjeuner"))
+    for u in unavails:
+        plan[Z[u]].append((B[u], f"indisponibilité"))
+        plan[Z[u]].append((B[u]+node_list[t].duration, f"indisponibilité"))
+
+    column_labels = [[] for i in range(N)]
+    for k in range(N):
+        column_labels[k].append("horaires")
+        column_labels[k].append(f"{employee_list[k].name}")
+
+    for k in range(N):
+        plan[k].sort(key=lambda x: x[0])
+
+        chose = []
+        for i in range(0, len(plan[k])-1, 2):
+            chose.append(
+                [f"{time_format(plan[k][i][0])} - {time_format(plan[k][i+1][0])}", plan[k][i][1]])
+        plan[k] = chose
+
+    for k in range(N):
+        Ax[k].axis('tight')
+        Ax[k].axis('off')
+        Ax[k].table(cellText=plan[k], colLabels=column_labels[k])
+
+    plt.show()
