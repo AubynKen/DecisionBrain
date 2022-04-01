@@ -190,7 +190,7 @@ def plot_agenda(employee_list, node_list, tasks, unavails, B, Z, lunch_times):
         plan[k].append((lunch_times[k]+60, f"pause déjeuner"))
     for u in unavails:
         plan[Z[u]].append((B[u].x, f"indisponibilité"))
-        plan[Z[u]].append((B[u].x+node_list[t].duration, f"indisponibilité"))
+        plan[Z[u]].append((B[u].x+node_list[u].duration, f"indisponibilité"))
 
     column_labels = [[] for i in range(N)]
     for k in range(N):
@@ -232,7 +232,7 @@ def plot_agenda_V3(employee_list, node_list, tasks, unavails, B, Z, lunch_times)
     for k in range(N):
         plan[k].append((lunch_times[k], lunch_times[k]+60, f"pause déjeuner"))
     for u in unavails:
-        plan[Z[u]].append((B[u], B[u]+node_list[t].duration, f"indisponibilité"))
+        plan[Z[u]].append((B[u], B[u]+node_list[u].duration, f"indisponibilité"))
 
     column_labels = [[] for i in range(N)]
     for k in range(N):
