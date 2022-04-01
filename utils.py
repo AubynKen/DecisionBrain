@@ -178,13 +178,6 @@ def time_format(min):
 
 def plot_agenda(employee_list, node_list, tasks, unavails, B, Z, lunch_times):
     N = len(employee_list)
-    left, width = 0.1, 2.0
-    bottom, height = 0.1, 0.8
-
-    Table = {k: [left + width/N*k, bottom, width/N - 0.1, height]
-             for k in range(N)}
-
-    Ax = {k: plt.axes(Table[k], frameon=False) for k in range(N)}
 
     plan = [[] for i in range(N)]
 
@@ -213,35 +206,33 @@ def plot_agenda(employee_list, node_list, tasks, unavails, B, Z, lunch_times):
                 [f"{time_format(plan[k][i][0])} - {time_format(plan[k][i+1][0])}", plan[k][i][1]])
         plan[k] = chose
 
+    left, width = 0.1, 2.0
+    bottom, height = 0.1, 0.8
+
     for k in range(N):
-        Ax[k].axis('tight')
-        Ax[k].axis('off')
-        Ax[k].table(cellText=plan[k], colLabels=column_labels[k])
+        plt.figure(k+1)
+
+        Table = [left + width/N*k, bottom, width/N - 0.1, height]
+
+        Ax = plt.axes(Table, frameon=False)
+        Ax.axis('tight')
+        Ax.axis('off')
+        Ax.table(cellText=plan[k], colLabels=column_labels[k])
 
     plt.show()
 
 def plot_agenda_V3(employee_list, node_list, tasks, unavails, B, Z, lunch_times):
     N = len(employee_list)
-    left, width = 0.1, 2.0
-    bottom, height = 0.1, 0.8
-
-    Table = {k: [left + width/N*k, bottom, width/N - 0.1, height]
-             for k in range(N)}
-
-    Ax = {k: plt.axes(Table[k], frameon=False) for k in range(N)}
 
     plan = [[] for i in range(N)]
 
     for t in tasks:
         if t in Z.keys():
-            plan[Z[t]].append((B[t], f"tâche {t-N+1}"))
-            plan[Z[t]].append((B[t]+node_list[t].duration, f"tâche {t-N+1}"))
+            plan[Z[t]].append((B[t], B[t]+node_list[t].duration, f"tâche {t-N+1}"))
     for k in range(N):
-        plan[k].append((lunch_times[k], f"pause déjeuner"))
-        plan[k].append((lunch_times[k]+60, f"pause déjeuner"))
+        plan[k].append((lunch_times[k], lunch_times[k]+60, f"pause déjeuner"))
     for u in unavails:
-        plan[Z[u]].append((B[u], f"indisponibilité"))
-        plan[Z[u]].append((B[u]+node_list[t].duration, f"indisponibilité"))
+        plan[Z[u]].append((B[u], B[u]+node_list[t].duration, f"indisponibilité"))
 
     column_labels = [[] for i in range(N)]
     for k in range(N):
@@ -252,14 +243,22 @@ def plot_agenda_V3(employee_list, node_list, tasks, unavails, B, Z, lunch_times)
         plan[k].sort(key=lambda x: x[0])
 
         chose = []
-        for i in range(0, len(plan[k])-1, 2):
+        for i in range(len(plan[k])):
             chose.append(
-                [f"{time_format(plan[k][i][0])} - {time_format(plan[k][i+1][0])}", plan[k][i][1]])
+                [f"{time_format(plan[k][i][0])} - {time_format(plan[k][i][1])}", plan[k][i][2]])
         plan[k] = chose
 
+    left, width = 0.1, 0.5
+    bottom, height = 0.1, 2
+
     for k in range(N):
-        Ax[k].axis('tight')
-        Ax[k].axis('off')
-        Ax[k].table(cellText=plan[k], colLabels=column_labels[k])
+        plt.figure(k+1)
+
+        Table = [left, bottom, width, height]
+
+        Ax = plt.axes(Table, frameon=False)
+        Ax.axis('tight')
+        Ax.axis('off')
+        Ax.table(cellText=plan[k], colLabels=column_labels[k])
 
     plt.show()
